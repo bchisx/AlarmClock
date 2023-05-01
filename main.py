@@ -1,28 +1,30 @@
 import time
 import subprocess
+import reconfPushbutton as rp
 
-file = input("Enter URL:")
-browser = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
-def setAlarm():
-    waketime_raw = input("Please enter desired waketime:")
+def setAlarm(waketime_raw):
     waketime = time.strptime(waketime_raw, "%H%M")
+    if waketime.tm_hour < 0 or waketime.tm_hour > 23:
+        raise ValueError("Invalid waketime")
+    if waketime.tm_min < 0 or waketime.tm_min > 59:
+        raise ValueError("Invalid waketime")
     return waketime
+
 def getTime():
     return time.localtime()
 
 def realAlarm(value):
-    check = 0
-    while (check == 0):
-        if (value.tm_hour == getTime().tm_hour and
-                value.tm_min == getTime().tm_min):
+    while True:
+        if value.tm_hour == getTime().tm_hour and value.tm_min == getTime().tm_min:
             subprocess.Popen([browser, file])
-            check = 1
+            break
+        time.sleep(1)
 
 if __name__ == '__main__':
-    #ss.SimplifiedService()
-    setValue = setAlarm()
-    print(setValue)
-    print(getTime())
-
+    setValue = setAlarm(input("Please enter desired waketime:"))
+    reconfPushbutton = rp.ReconfPushbutton()
+    browser = reconfPushbutton.ret_player_link()
+    file = reconfPushbutton.ret_file_link()
     realAlarm(setValue)
+
